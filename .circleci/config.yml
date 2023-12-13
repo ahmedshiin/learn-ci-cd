@@ -46,7 +46,16 @@ jobs:
       - run:
           command: "npm run unit-tests"
           working_directory: backend/
-
+  release:
+    docker:
+      - image: node:lts
+    steps:
+      - checkout
+      - run:
+          command: "npm install"
+      - run:
+          command: "npm run semantic-release"
+      
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
@@ -55,3 +64,6 @@ workflows:
       - backend-lint
       - backend-type-check
       - backend-unit-tests
+  cd-workflow:
+    jobs:
+      - release
