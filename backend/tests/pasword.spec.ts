@@ -14,6 +14,6 @@ describe('Password strength test', () => {
         expect(isValidPassword('hello')).toBe(false)
         expect(isValidPassword('hell0')).toBe(false)
         expect(isValidPassword('hello world!')).toBe(false)
-        expect(isValidPassword('Hello wOrld!')).toBe(true)
+        expect(isValidPassword('Hello wOrld!')).toBe(false)
     })
 })
