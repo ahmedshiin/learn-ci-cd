@@ -63,6 +63,9 @@ jobs:
       - run:
           command: "npm install"
       - run:
+          command: "npm run db-install"
+          working_directory: backend/
+      - run:
           command: "npm run build"
           working_directory: frontend/
       - run:
