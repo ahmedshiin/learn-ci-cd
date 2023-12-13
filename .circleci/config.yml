@@ -60,6 +60,11 @@ jobs:
       - image: node:lts
     steps:
       - checkout
+      - run: sudo apt-get update && sudo apt-get install -y sshpass
+      - run:
+          name: "Set Release Directory"
+          command: |
+            RELEASE_DIRECTORY=$(date +"%Y-%m-%dT%H_%M_%S")
       - run:
           command: "npm install"
       - run:
@@ -68,8 +73,30 @@ jobs:
       - run:
           command: "npm run build"
           working_directory: backend/ 
-
-      
+      - run:
+          name: "Copy Backend to Remote"
+          command: |
+            scp -r backend/build/* $USERNAME@$REMOTE_IP:/root/backend/releases/$RELEASE_DIRECTORY
+      - run:
+          name: "Update Symlink and Restart Backend"
+          command: |
+            ssh $USERNAME@$REMOTE_IP << EOF
+              rm -f /root/backend/current
+              ln -s /root/backend/releases/$RELEASE_DIRECTORY /root/backend/current
+              sudo systemctl restart backend-service
+            EOF
+      - run:
+          name: "Copy Frontend to Remote"
+          command: |
+            scp -r frontend/build/* $USERNAME@$REMOTE_IP:/root/frontend/releases/$RELEASE_DIRECTORY
+      - run:
+          name: "Update Symlink and Restart Frontend"
+          command: |
+            ssh $USERNAME@$REMOTE_IP << EOF
+              rm -f /root/frontend/current
+              ln -s /root/frontend/releases/$RELEASE_DIRECTORY /root/frontend/current
+              # Additional steps to restart frontend service if needed
+            EOF
       
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
