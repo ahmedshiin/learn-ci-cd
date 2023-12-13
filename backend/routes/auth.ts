@@ -4,6 +4,11 @@ import { usePrisma } from '../orm/database'
 import type { ErrorFn, TypedReq, TypedRouteInterface } from './helpers/typed-router'
 import { TypedRouter } from './helpers/typed-router'
 
+export function isValidPassword(password: string) {
+    // Contains at least 8 characters and a number
+    return password.length >= 8 && password.match(/[0-9]/) !== null
+}
+
 const prisma = usePrisma()
 
 const typedRouter = new TypedRouter()
@@ -27,8 +32,8 @@ const typedRouter = new TypedRouter()
                     if (typeof password !== 'string') throw new Error('')
 
                     // Vérifier si l'utilisateur existe déjà
-                    if (password.length < 8) {
-                        return error(400, 'Too short password')
+                    if (!isValidPassword(password)) {
+                        return error(400, 'Invalid password')
                     }
                     const userWithSameEmail = await prisma.user.findFirst({ where: { email } })
 
